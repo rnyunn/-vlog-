@@ -1,0 +1,27 @@
+name: Sync to Gitee
+
+on:
+  push:
+    branches:
+      - main          # 监听 main 分支的推送
+  schedule:
+    - cron: '0 0 * * *'  # 每天凌晨0点自动同步一次
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub repo
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Push to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          git remote add gitee https://oauth2:${GITEE_TOKEN}@gitee.com/seven/speakingtogether.git
+          git push -u gitee main --force
